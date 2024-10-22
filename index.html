@@ -150,12 +150,12 @@
 </head>
 
 <body>
-    <button id="auto-login-btn">Login</button>
+    <!-- <button id="auto-login-btn">Login</button>
     <button id="edit-login-btn">Edit Data Login</button>
-    <button id="refresh-token-btn">Refresh Token</button>
+    <button id="refresh-token-btn">Refresh Token</button> -->
 
     <!-- Modal for editing login data -->
-    <div id="login-modal">
+    <!-- <div id="login-modal">
         <div id="login-modal-content">
             <span id="close-modal">&times;</span>
             <h2>Edit Login Data</h2>
@@ -169,7 +169,7 @@
                 <button type="submit">Save</button>
             </form>
         </div>
-    </div>
+    </div> -->
 
     <div id="swagger-ui"></div>
 
@@ -179,7 +179,6 @@
             const ui = SwaggerUIBundle({
                 url: "openapi.yml",
                 dom_id: "#swagger-ui",
-                docExpansion: "none",
                 presets: [
                     SwaggerUIBundle.presets.apis,
                     SwaggerUIBundle.SwaggerUIStandalonePreset
