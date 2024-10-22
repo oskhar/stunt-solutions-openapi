@@ -1,0 +1,2657 @@
+openapi: "3.0.2"
+info:
+  title: POS GG
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    OKResponse:
+      description: OK
+      content:
+        application/json:
+          example:
+            status: true
+            message: "Success! Your request has safely landed back to Earth."
+            meta:
+              request_id: "string"
+    CreatedResponse:
+      description: CREATED
+      content:
+        application/json:
+          example:
+            status: true
+            message: "New entity launched into the cosmos."
+            meta:
+              request_id: "string"
+    NoContentResponse:
+      description: NO_CONTENT
+    UnauthorizedResponse:
+      description: UNAUTHORIZED
+      content:
+        application/json:
+          example:
+            status: false
+            message: "Your credentials don't pass the cosmic gatekeeper!"
+            errors: "array<string>"
+            meta:
+              request_id: "string"
+    BadRequestResponse:
+      description: BAD REQUEST
+      content:
+        application/json:
+          example:
+            status: false
+            message: "Your request veered off course and couldn't escape Earth's gravity!"
+            errors: "array<string>"
+            meta:
+              request_id: "string"
+    ForbiddenResponse:
+      description: FORBIDDEN
+      content:
+        application/json:
+          example:
+            status: false
+            message: "Your request violates the Sacred Timeline and cannot be fulfilled!"
+            errors: "array<string>"
+            meta:
+              request_id: "string"
+    NotFoundResponse:
+      description: NOT FOUND
+      content:
+        application/json:
+          example:
+            status: false
+            message: "The data you're seeking is beyond the bounds of space!"
+            errors: "array<string>"
+            meta:
+              request_id: "string"
+    ConflictResponse:
+      description: CONFLICT
+      content:
+        application/json:
+          example:
+            status: false
+            message: "Collision in the cosmic pathways! Your request encountered a space-time conflict."
+            errors: "array<string>"
+            meta:
+              request_id: "string"
+    UnprocessableEntityResponse:
+      description: UNPROCESSABLE ENTITY
+      content:
+        application/json:
+          example:
+            status: false
+            message: "Data anomaly detected. Unable to process your request in this dimension!"
+            errors: "array<string>"
+            meta:
+              request_id: "string"
+security:
+  - BearerAuth: []
+servers:
+  - url: http://localhost:8000/api/v1
+tags:
+  - name: "Authentication: Admin Authorization"
+    description: For admin authentication
+  - name: "Authentication: Admin Data"
+    description: For managing admin data
+  - name: "Master Data: Supplier Data"
+    description: For managing supplier data
+  - name: "Master Data: Brand Data"
+    description: For managing brand data
+  - name: "Master Data: Unit Data"
+    description: For managing unit data
+  - name: "Master Data: Customer Group Data"
+    description: For managing customer data
+  - name: "Master Data: Category Data"
+    description: For managing category data
+  - name: "Master Data: Sub Category Data"
+    description: For managing sub category data
+  - name: "Accounting: Chart of Account"
+    description: For managing sub category data
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: for GUEST
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                full_name: "Caroline Crooks-Beatty"
+                email: "user@example.com"
+                phone_number: "0812345677"
+                password: "UserPassword098"
+                confirm_password: "UserPassword098"
+              rule:
+                full_name: "required|string"
+                email: "required|string"
+                phone_number: "required|numberstring"
+                password: "required|string|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/"
+                confirm_password: "required|string|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/"
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /auth/login:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: for GUEST
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                email_or_phone_number: "admin@example.com"
+                password: "TesPassword123"
+                remember_me: false
+              rule:
+                email_or_phone_number: "required|email"
+                password: "required|string"
+                remember_me: "boolean"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Login successful."
+                data:
+                  admin:
+                    id: "number"
+                    email: "string|email"
+                    phone_number: "string"
+                    language: "enum:en,id"
+                    full_name: "string"
+                    is_unable_working_time: "boolean"
+                    start_work: "time"
+                    finish_work: "time"
+                    nickname: "string"
+                    division: "string"
+                    created_at: "datetime"
+                  access_token: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+  /auth/refresh:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Successful."
+                data:
+                  access_token: "string"
+                meta:
+                  request_id: "string"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /auth/me:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Get self admin data successful."
+                data:
+                  admin:
+                    id: "number"
+                    email: "string|email"
+                    phone_number: "string"
+                    language: "enum:en,id"
+                    full_name: "string"
+                    is_unable_working_time: "boolean"
+                    start_work: "time"
+                    finish_work: "time"
+                    nickname: "string"
+                    division: "string"
+                    created_at: "datetime"
+                meta:
+                  request_id: "string"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /auth/logout:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: need ADMIN Authentication
+      responses:
+        204:
+          description: NO_CONTENT
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /auth/confirm-user:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: for GUEST
+      requestBody:
+        content:
+          application/json:
+            example:
+              rule:
+                token: "required|string"
+                email: "required|email"
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+  /auth/change-password:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                old_password: "TesPassword123"
+                new_password: "UbahPassword9"
+                confirm_password: "UbahPassword9"
+              example_backup:
+                old_password: "UbahPassword9"
+                new_password: "TesPassword123"
+                confirm_password: "TesPassword123"
+              rule:
+                old_password: "string|required|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/"
+                new_password: "string|required|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/"
+                new_password_confirmation: "string|required|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /permission/navbar:
+    post:
+      tags:
+        - "Authentication: Admin Authorization"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  menu:
+                    <array>:
+                      <object>:
+                        name: "string"
+                        children: []
+                        metadata:
+                          link: "string"
+                meta:
+                  request_id: "string"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  # ===============================================
+
+  /supplier:
+    get:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  suppliers:
+                    <array>:
+                      id: number
+                      code: string
+                      name: string
+                      country: string
+                      province: string
+                      city: string
+                      address: string
+                      pos_code: string
+                      phone_number: string
+                      fax: string
+                      contact: string
+                      email: string
+                      bank_account_number: string
+                      account_holder_name: string
+                      description: string
+                      bank: string
+                      npwp: string
+                      due_date: number
+                      tax_mode: string
+                      tax_source: string
+                      supplier_tax_value: number
+                      created_at: string
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    post:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                code: "a8eb36b2-a319-445e-8ce3-bcc548e36037"
+                name: "Huels Inc"
+                country: "Bahamas"
+                province: "Maine"
+                city: "Abbottboro"
+                address: "989 Larkin Common"
+                pos_code: "71175"
+                phone_number: "1-556-602-9130 x170"
+                fax: "1-317-654-3088 x61692"
+                contact: "Valerie Gottlieb"
+                email: "Hadley_Orn@yahoo.com"
+                bank_account_number: "57537498"
+                account_holder_name: "Minnie Fritsch"
+                description: "Decretum reiciendis cometes amplitudo avarus aegrotatio deludo consuasor."
+                bank: "Personal Loan Account"
+                npwp: "13921542402"
+                due_date: 64
+                tax_mode: "include"
+                tax_source: "item"
+                supplier_tax_value: 4.8
+              rule:
+                code: string
+                name: string
+                country: string
+                province: string
+                city: string
+                address: string
+                pos_code: string
+                phone_number: string
+                fax: string
+                contact: string
+                email: string
+                bank_account_number: string
+                account_holder_name: string
+                description: string
+                bank: string
+                npwp: string
+                due_date: number
+                tax_mode: string
+                tax_source: string
+                supplier_tax_value: number
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+    delete:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              id:
+                <array>: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /supplier/trashed:
+    get:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  suppliers:
+                    <array>:
+                      id: number
+                      code: string
+                      name: string
+                      country: string
+                      province: string
+                      city: string
+                      address: string
+                      pos_code: string
+                      phone_number: string
+                      fax: string
+                      contact: string
+                      email: string
+                      bank_account_number: string
+                      account_holder_name: string
+                      description: string
+                      bank: string
+                      npwp: string
+                      due_date: number
+                      tax_mode: string
+                      tax_source: string
+                      supplier_tax_value: number
+                      created_at: string
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /supplier/option:
+    get:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  suppliers:
+                    <array>:
+                      id: number
+                      name: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /supplier/{id}:
+    get:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  supplier:
+                    id: number
+                    code: string
+                    name: string
+                    country: string
+                    province: string
+                    city: string
+                    address: string
+                    pos_code: string
+                    phone_number: string
+                    fax: string
+                    contact: string
+                    email: string
+                    bank_account_number: string
+                    account_holder_name: string
+                    description: string
+                    bank: string
+                    npwp: string
+                    due_date: number
+                    tax_mode: string
+                    tax_source: string
+                    supplier_tax_value: number
+                    created_at: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    put:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                code: "a8eb36b2-a319-445e-8ce3-bcc548e36037"
+                name: "Huels Inc"
+                country: "Bahamas"
+                province: "Maine"
+                city: "Abbottboro"
+                address: "989 Larkin Common"
+                pos_code: "71175"
+                phone_number: "1-556-602-9130 x170"
+                fax: "1-317-654-3088 x61692"
+                contact: "Valerie Gottlieb"
+                email: "Hadley_Orn@yahoo.com"
+                bank_account_number: "57537498"
+                account_holder_name: "Minnie Fritsch"
+                description: "Decretum reiciendis cometes amplitudo avarus aegrotatio deludo consuasor."
+                bank: "Personal Loan Account"
+                npwp: "13921542402"
+                due_date: 64
+                tax_mode: "include"
+                tax_source: "item"
+                supplier_tax_value: 4.8
+              rule:
+                code: string
+                name: string
+                country: string
+                province: string
+                city: string
+                address: string
+                pos_code: string
+                phone_number: string
+                fax: string
+                contact: string
+                email: string
+                bank_account_number: string
+                account_holder_name: string
+                description: string
+                bank: string
+                npwp: string
+                due_date: number
+                tax_mode: string
+                tax_source: string
+                supplier_tax_value: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /supplier/{id}/restore:
+    post:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /supplier/{id}/destroy:
+    delete:
+      tags:
+        - "Master Data: Supplier Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        204:
+          $ref: "#/components/responses/NoContentResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+
+  # ===============================================
+
+  /brand:
+    get:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  brands:
+                    <array>:
+                      id: string
+                      name: string
+                      image_url: string|link
+                      description: string
+                      created_at: Date
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    post:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: "Mbak Jestine"
+                description: "Decretum reiciendis cometes amplitudo avarus aegrotatio deludo consuasor."
+                image: null
+              rule:
+                name: string|required
+                description: string
+                image: File
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+    delete:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              id:
+                <array>: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /brand/trashed:
+    get:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  brands:
+                    <array>:
+                      id: string
+                      name: "string"
+                      image_url: "string|link"
+                      description: "string"
+                      created_at: Date
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /brand/option:
+    get:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  brands:
+                    <array>:
+                      id: number
+                      name: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /brand/{id}:
+    get:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  brand:
+                    id: string
+                    name: string
+                    image_url: string|link
+                    description: string
+                    created_at: Date
+                meta:
+                  request_id: string
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    put:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: "Mbak Vallen"
+                description: "Kamu keren bang."
+                image: null
+              rule:
+                name: string|required
+                description: string
+                image: File
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /brand/{id}/restore:
+    post:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /brand/{id}/destroy:
+    delete:
+      tags:
+        - "Master Data: Brand Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        204:
+          $ref: "#/components/responses/NoContentResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+
+  # ===============================================
+
+  /unit:
+    get:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  units:
+                    <array>:
+                      id: "number"
+                      name: "string"
+                      description: "string"
+                      created_at: "string"
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    post:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: BOX
+                description: BOX
+              rule:
+                name: string
+                description: string
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+    delete:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              id:
+                <array>: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /unit/trashed:
+    get:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  units:
+                    <array>:
+                      id: "number"
+                      name: "string"
+                      description: "string"
+                      created_at: "string"
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /unit/option:
+    get:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  units:
+                    <array>:
+                      id: number
+                      name: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /unit/{id}:
+    get:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  unit:
+                    id: number
+                    name: string
+                    description: string
+                    created_at: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    put:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: DUS
+                description: DUS
+              rule:
+                name: string
+                description: string
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /unit/{id}/restore:
+    post:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /unit/{id}/destroy:
+    delete:
+      tags:
+        - "Master Data: Unit Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        204:
+          $ref: "#/components/responses/NoContentResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+
+  # ===============================================
+
+  /customer-group:
+    get:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  customer_groups:
+                    <array>:
+                      id: "number"
+                      name: "string"
+                      description: "string"
+                      created_at: "string"
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    post:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: "Tsd"
+                code: "Tsd"
+                discount: 12
+                price_level: 1
+                subscription_price: true
+              rule:
+                name: string
+                code: string
+                discount: number
+                price_level: number
+                subscription_price: boolean
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+    delete:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              id:
+                <array>: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /customer-group/trashed:
+    get:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  customer_groups:
+                    <array>:
+                      id: "number"
+                      name: "string"
+                      code: "string"
+                      discount: "number"
+                      price_level: "number"
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /customer-group/option:
+    get:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  customer_groups:
+                    <array>:
+                      id: number
+                      name: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /customer-group/{id}:
+    get:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  customer_group:
+                    id: "number"
+                    name: "string"
+                    code: "string"
+                    discount: "number"
+                    price_level: "number"
+                    subscription_price: "boolean"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    put:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: "Tsd"
+                code: "Tsd"
+                discount: 12
+                price_level: 1
+                subscription_price: true
+              rule:
+                name: string
+                code: string
+                discount: number
+                price_level: number
+                subscription_price: boolean
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /customer-group/{id}/restore:
+    post:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /customer-group/{id}/destroy:
+    delete:
+      tags:
+        - "Master Data: Customer Group Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        204:
+          $ref: "#/components/responses/NoContentResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+
+  # ===============================================
+
+  /category:
+    get:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  categories:
+                    <array>:
+                      id: number
+                      name: string
+                      description: string
+                      created_at: Datetime
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    post:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: "Mbak Jestine"
+                description: "Decretum reiciendis cometes amplitudo avarus aegrotatio deludo consuasor."
+              rule:
+                name: string|required
+                description: string
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+    delete:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              id:
+                <array>: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /category/trashed:
+    get:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  categories:
+                    <array>:
+                      id: number
+                      name: string
+                      description: string
+                      created_at: Datetime
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /category/option:
+    get:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  categories:
+                    <array>:
+                      id: number
+                      name: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /category/{id}:
+    get:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  category:
+                    id: number
+                    name: string
+                    description: string
+                    created_at: string
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    put:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                name: "Mbak Vallen"
+                description: "Kamu keren bang."
+              rule:
+                name: string|required
+                description: string
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /category/{id}/restore:
+    post:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /category/{id}/destroy:
+    delete:
+      tags:
+        - "Master Data: Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        204:
+          $ref: "#/components/responses/NoContentResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+
+  # ===============================================
+
+  /sub-category:
+    get:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  sub_categories:
+                    <array>:
+                      id: integer
+                      parent_category: string
+                      name: string|required
+                      description: string
+                      created_at: Datetime
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    delete:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      requestBody:
+        content:
+          application/json:
+            example:
+              id:
+                <array>: string
+      responses:
+        204:
+          description: No Content
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /category/{id}/sub-category:
+    post:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                parent_id: 1
+                name: "Mbak Vallen"
+                description: "Kamu keren bang."
+              rule:
+                parent_id: integer
+                name: string|required
+                description: string
+      responses:
+        201:
+          $ref: "#/components/responses/CreatedResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /sub-category/trashed:
+    get:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: length
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: number
+            default: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: date
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  sub_categories:
+                    <array>:
+                      id: integer
+                      parent_category: string
+                      name: string|required
+                      description: string
+                      created_at: Datetime
+                  pagination:
+                    total: "number"
+                    per_page: "number"
+                    current_page: "number"
+                    total_pages: "number"
+                    links:
+                      next: "string"
+                      prev: "string"
+                      first: "string"
+                      last: "string"
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /category/{id}/sub-category/option:
+    get:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      description: "Untuk mengambil seluruh data sub category berdasarkan id dari categorynya, pernyataan `/option` berarti data yang diambil hanya sebagai pilihan dan hanya mengambil data minimum yaitu: id, name"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  sub_categories:
+                    <array>:
+                      id: integer
+                      name: string|required
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /sub-category/{id}:
+    get:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                status: true
+                message: "Success! Your request has safely landed back to Earth."
+                data:
+                  sub_category:
+                    <array>:
+                      id: integer
+                      parent_category: string
+                      name: string|required
+                      description: string
+                      created_at: Datetime
+                meta:
+                  request_id: "string"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+    put:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                parent_id: 1
+                name: "Mbak Vallen"
+                description: "Kamu keren bang."
+              rule:
+                parent_id: integer
+                name: string|required
+                description: string
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+        409:
+          $ref: "#/components/responses/ConflictResponse"
+        422:
+          $ref: "#/components/responses/UnprocessableEntityResponse"
+  /sub-category/{id}/restore:
+    post:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: "#/components/responses/OKResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
+  /sub-category/{id}/destroy:
+    delete:
+      tags:
+        - "Master Data: Sub Category Data"
+      summary: need ADMIN Authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        204:
+          $ref: "#/components/responses/NoContentResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          $ref: "#/components/responses/NotFoundResponse"
