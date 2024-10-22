@@ -6,87 +6,6 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
-  responses:
-    OKResponse:
-      description: OK
-      content:
-        application/json:
-          example:
-            status: true
-            message: "Success! Your request has safely landed back to Earth."
-            meta:
-              request_id: "string"
-    CreatedResponse:
-      description: CREATED
-      content:
-        application/json:
-          example:
-            status: true
-            message: "New entity launched into the cosmos."
-            meta:
-              request_id: "string"
-    NoContentResponse:
-      description: NO_CONTENT
-    UnauthorizedResponse:
-      description: UNAUTHORIZED
-      content:
-        application/json:
-          example:
-            status: false
-            message: "Your credentials don't pass the cosmic gatekeeper!"
-            errors: "array<string>"
-            meta:
-              request_id: "string"
-    BadRequestResponse:
-      description: BAD REQUEST
-      content:
-        application/json:
-          example:
-            status: false
-            message: "Your request veered off course and couldn't escape Earth's gravity!"
-            errors: "array<string>"
-            meta:
-              request_id: "string"
-    ForbiddenResponse:
-      description: FORBIDDEN
-      content:
-        application/json:
-          example:
-            status: false
-            message: "Your request violates the Sacred Timeline and cannot be fulfilled!"
-            errors: "array<string>"
-            meta:
-              request_id: "string"
-    NotFoundResponse:
-      description: NOT FOUND
-      content:
-        application/json:
-          example:
-            status: false
-            message: "The data you're seeking is beyond the bounds of space!"
-            errors: "array<string>"
-            meta:
-              request_id: "string"
-    ConflictResponse:
-      description: CONFLICT
-      content:
-        application/json:
-          example:
-            status: false
-            message: "Collision in the cosmic pathways! Your request encountered a space-time conflict."
-            errors: "array<string>"
-            meta:
-              request_id: "string"
-    UnprocessableEntityResponse:
-      description: UNPROCESSABLE ENTITY
-      content:
-        application/json:
-          example:
-            status: false
-            message: "Data anomaly detected. Unable to process your request in this dimension!"
-            errors: "array<string>"
-            meta:
-              request_id: "string"
 security:
   - BearerAuth: []
 servers:
@@ -128,16 +47,6 @@ paths:
                 id: integer,
                 recomendation: text,
                 weight: string
-        400:
-          $ref: "#/components/responses/BadRequestResponse"
-        401:
-          $ref: "#/components/responses/UnauthorizedResponse"
-        403:
-          $ref: "#/components/responses/ForbiddenResponse"
-        409:
-          $ref: "#/components/responses/ConflictResponse"
-        422:
-          $ref: "#/components/responses/UnprocessableEntityResponse"
   /check-up/{id}/product:
     post:
       tags:
@@ -172,13 +81,3 @@ paths:
                   vitamin_d_ug: float
                   zat_besi_mg: float
                   zinc_mg: float
-        400:
-          $ref: "#/components/responses/BadRequestResponse"
-        401:
-          $ref: "#/components/responses/UnauthorizedResponse"
-        403:
-          $ref: "#/components/responses/ForbiddenResponse"
-        409:
-          $ref: "#/components/responses/ConflictResponse"
-        422:
-          $ref: "#/components/responses/UnprocessableEntityResponse"
