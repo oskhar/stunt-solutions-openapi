@@ -15,6 +15,61 @@ tags:
     description: For api endpoint documentation
 
 paths:
+  /kms:
+    post:
+      tags:
+        - Endpoint
+      summary: for GUEST
+      requestBody:
+        content:
+          application/json:
+            example:
+              example:
+                <array>:
+                  umur_bulan: 1
+                  jenis_kelamin: L
+                  berat_badan: 3.5
+                  tinggi_badan: 20
+                  lingkar_kepala: 10
+              rule:
+                <array>:
+                  umur_bulan: integer
+                  jenis_kelamin: enum:L,P
+                  berat_badan: float
+                  tinggi_badan: float
+                  lingkar_kepala: float
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              example:
+                series:
+                  - name: "Terlalu Gemuk"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Berat Gemuk"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Berat Normal"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Berat Baik"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Berat Normal"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Berat Kurus"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Terlalu Kurus, butuh penanganan"
+                    type: "line"
+                    data: ["integer"]
+                  - name: "Berat bayi"
+                    type: "line"
+                    data: ["integer"]
+
   /check-up:
     post:
       tags:
@@ -48,7 +103,7 @@ paths:
                 recomendation: text,
                 weight: string
   /check-up/{id}/product:
-    post:
+    get:
       tags:
         - Endpoint
       summary: for GUEST
@@ -65,14 +120,14 @@ paths:
             application/json:
               example:
                 <array>:
+                  id: 2
+                  name: "Nutrilon 3"
                   energi_kcal: float
                   folate_ug: float
                   gula_g: float
-                  id: 2
                   kalsium_mg: float
                   lemak_g: float
                   magnesium_mg: float
-                  name: "Nutrilon 3"
                   omega_3_mg: float
                   omega_6_mg: float
                   protein_g: float
